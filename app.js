@@ -94,9 +94,11 @@
   }
   function setDrawer(open) {
     const d = $('#drawer'); if (!d) return;
+    const wasOpen = d.classList.contains('open');
     d.classList.toggle('open', open); d.setAttribute('aria-hidden', String(!open));
     document.body.classList.toggle('lock', open);
     if (open) $('#drawerClose').focus();
+    else if (wasOpen) $('.basket-btn')?.focus();
   }
 
   /* ---------- Global wiring ---------- */
@@ -106,8 +108,9 @@
     onScroll(); window.addEventListener('scroll', onScroll, { passive: true });
 
     const nav = $('#nav'), tgl = $('#menuToggle');
-    tgl.addEventListener('click', () => { const o = nav.classList.toggle('open'); tgl.setAttribute('aria-expanded', o); document.body.classList.toggle('lock', o); });
-    $$('#nav a').forEach(a => a.addEventListener('click', () => { nav.classList.remove('open'); tgl.setAttribute('aria-expanded', false); document.body.classList.remove('lock'); }));
+    const closeNav = () => { nav.classList.remove('open'); tgl.setAttribute('aria-expanded', 'false'); document.body.classList.remove('lock'); };
+    tgl.addEventListener('click', () => { const o = nav.classList.toggle('open'); tgl.setAttribute('aria-expanded', String(o)); document.body.classList.toggle('lock', o); });
+    $$('#nav a').forEach(a => a.addEventListener('click', closeNav));
 
     document.addEventListener('click', e => {
       const t = e.target.closest('button, a'); if (!t) return;
@@ -121,7 +124,11 @@
       else if (t.id === 'basketCopy') navigator.clipboard?.writeText(basketMessage()).then(() => toast('Basket copied'));
       else if (t.id === 'basketClear') { basket = []; save(); }
     });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') setDrawer(false); });
+    document.addEventListener('keydown', e => {
+      if (e.key !== 'Escape') return;
+      if ($('#drawer')?.classList.contains('open')) setDrawer(false);
+      if (nav.classList.contains('open')) { closeNav(); tgl.focus(); }
+    });
     $$('[data-wa]').forEach(a => a.addEventListener('click', e => { e.preventDefault(); openWhatsApp(a.dataset.wa); }));
 
     const yr = $('#year'); if (yr) yr.textContent = new Date().getFullYear();

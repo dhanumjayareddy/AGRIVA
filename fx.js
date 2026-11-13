@@ -37,19 +37,21 @@
       ticking = false;
       const max = document.documentElement.scrollHeight - innerHeight;
       bar.style.transform = `scaleX(${max > 0 ? scrollY / max : 0})`;
-      par.forEach(el => {
-        if (!el.parentElement) return;
-        const host = el.parentElement.getBoundingClientRect();
-        if (host.bottom < -100 || host.top > innerHeight + 100) return;
-        const p = (host.top + host.height / 2 - innerHeight / 2) / innerHeight; // -1 .. 1
-        el.style.translate = `0 ${(p * -42).toFixed(1)}px`;
-      });
-      vel = vel * .85 + (scrollY - lastY) * .15; lastY = scrollY;
-      if (track && track.getAnimations) { const a = track.getAnimations()[0]; if (a) a.playbackRate = 1 + Math.min(Math.abs(vel) * .35, 6); }
+      if (fine) {
+        par.forEach(el => {
+          if (!el.parentElement) return;
+          const host = el.parentElement.getBoundingClientRect();
+          if (host.bottom < -100 || host.top > innerHeight + 100) return;
+          const p = (host.top + host.height / 2 - innerHeight / 2) / innerHeight; // -1 .. 1
+          el.style.translate = `0 ${(p * -42).toFixed(1)}px`;
+        });
+        vel = vel * .85 + (scrollY - lastY) * .15; lastY = scrollY;
+        if (track && track.getAnimations) { const a = track.getAnimations()[0]; if (a) a.playbackRate = 1 + Math.min(Math.abs(vel) * .35, 6); }
+      }
     };
     const kick = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
     addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick); frame();
-    (function decay() { if (Math.abs(vel) > .05) { vel *= .9; frame(); } requestAnimationFrame(decay); })();
+    if (fine) (function decay() { if (Math.abs(vel) > .05) { vel *= .9; frame(); } requestAnimationFrame(decay); })();
 
     if (!fine) return;
 
