@@ -32,7 +32,7 @@
 
     /* Scroll loop: progress, parallax, ticker speed */
     const par = $$('[data-parallax]'), track = $('.ticker-track');
-    let lastY = scrollY, vel = 0, ticking = false;
+    let lastY = scrollY, vel = 0, ticking = false, decaying = false;
     const frame = () => {
       ticking = false;
       const max = document.documentElement.scrollHeight - innerHeight;
@@ -45,13 +45,25 @@
           const p = (host.top + host.height / 2 - innerHeight / 2) / innerHeight; // -1 .. 1
           el.style.translate = `0 ${(p * -42).toFixed(1)}px`;
         });
-        vel = vel * .85 + (scrollY - lastY) * .15; lastY = scrollY;
-        if (track && track.getAnimations) { const a = track.getAnimations()[0]; if (a) a.playbackRate = 1 + Math.min(Math.abs(vel) * .35, 6); }
       }
+      vel = vel * .85 + (scrollY - lastY) * .15; lastY = scrollY;
+      if (track && track.getAnimations) { const a = track.getAnimations()[0]; if (a) a.playbackRate = 1 + Math.min(Math.abs(vel) * .35, 6); }
     };
-    const kick = () => { if (!ticking) { ticking = true; requestAnimationFrame(frame); } };
+    const decay = () => {
+      vel *= .9;
+      if (Math.abs(vel) <= .05) {
+        vel = 0; decaying = false;
+        if (!ticking) { ticking = true; requestAnimationFrame(frame); }
+        return;
+      }
+      if (!ticking) { ticking = true; requestAnimationFrame(frame); }
+      requestAnimationFrame(decay);
+    };
+    const kick = () => {
+      if (!ticking) { ticking = true; requestAnimationFrame(frame); }
+      if (!decaying) { decaying = true; requestAnimationFrame(decay); }
+    };
     addEventListener('scroll', kick, { passive: true }); addEventListener('resize', kick); frame();
-    if (fine) (function decay() { if (Math.abs(vel) > .05) { vel *= .9; frame(); } requestAnimationFrame(decay); })();
 
     if (!fine) return;
 

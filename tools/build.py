@@ -11,12 +11,13 @@ FONTS = '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="p
 def page(fname, key, title, desc, body, extra_head=""):
     cur = ' aria-current="page"'
     nav = "".join(f'<a href="{h}"{cur if h==fname else ""}>{t}</a>' for h,t in NAV)
+    hero_preload = '<link rel="preload" as="image" href="assets/img/hero.jpg" fetchpriority="high">' if fname == "index.html" else ""
     html = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{title}</title><meta name="description" content="{desc}"><meta name="theme-color" content="#1f4636">
 <link rel="canonical" href="{DOMAIN}/{'' if fname=='index.html' else fname}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="AGRIVA"><meta property="og:title" content="{title}"><meta property="og:description" content="{desc}">
-<link rel="icon" href="assets/agriva-mark.svg" type="image/svg+xml">{FONTS}<link rel="stylesheet" href="styles.css">{extra_head}
+<link rel="icon" href="assets/agriva-mark.svg" type="image/svg+xml">{hero_preload}{FONTS}<link rel="stylesheet" href="styles.css">{extra_head}
 <script defer src="site-config.js"></script><script defer src="images.js"></script><script defer src="catalog.js"></script><script defer src="app.js"></script><script defer src="fx.js"></script></head>
 <body data-page="{key}"><a class="skip" href="#main">Skip to content</a>
 <div class="bar">Cold pressed oils &amp; dry fruits · Order by WhatsApp</div>
@@ -50,15 +51,15 @@ f'''<section class="hero"><div class="container hero-grid">
 <h1 class="display">Goodness, kept <em>close</em> to its source.</h1>
 <p class="lede">Cold pressed oils and everyday dry fruits, chosen for the pantry you actually cook from. Browse, build a basket, and we'll confirm the rest with you.</p>
 <div class="hero-cta"><a class="btn" href="shop.html">Shop the range</a><a class="btn btn-ghost" href="about.html">Our story</a></div></div>
-<div class="hero-visual"><div class="photo arch"><img data-slot="hero" data-local="assets/img/hero.jpg" referrerpolicy="no-referrer" data-parallax alt="Cold pressed oil and dry fruits on a kitchen table"></div>
+<div class="hero-visual"><div class="photo arch"><img src="assets/img/hero.jpg" data-slot="hero" data-local="assets/img/hero.jpg" fetchpriority="high" loading="eager" decoding="async" referrerpolicy="no-referrer" data-parallax alt="Cold pressed oil and dry fruits on a kitchen table"></div>
 <div class="hero-stamp"><b>Ask before you order</b>Price, pack and stock confirmed by a real person.</div></div></div></section>
 <div class="ticker" aria-hidden="true"><div class="ticker-track">{ticker}</div></div>
 
 <section class="section"><div class="container">
 <div class="section-head"><div><span class="kicker">Collections</span><h2 class="display">Two shelves, <em>one</em> kitchen.</h2></div><p>Start with the oils or the dry fruits. Every product page lets you pick a pack size and add it to your basket.</p></div>
 <div class="collections">
-<a class="coll oils reveal" href="shop.html?category=oils"><img data-slot="oils" data-local="assets/img/oils.jpg" referrerpolicy="no-referrer" data-parallax alt=""><div class="coll-body"><span class="kicker">Collection 01</span><h3>Cold pressed oils</h3><p>Groundnut, sesame, coconut, mustard and more.</p><span class="go">Explore oils</span></div></a>
-<a class="coll dry reveal" href="shop.html?category=dry-fruits"><img data-slot="dryfruits" data-local="assets/img/dryfruits.jpg" referrerpolicy="no-referrer" data-parallax alt=""><div class="coll-body"><span class="kicker">Collection 02</span><h3>Dry fruits &amp; seeds</h3><p>Almonds, cashews, dates, figs and pumpkin seeds.</p><span class="go">Explore dry fruits</span></div></a>
+<a class="coll oils reveal" href="shop.html?category=oils"><img data-slot="oils" data-local="assets/img/oils.jpg" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-parallax alt=""><div class="coll-body"><span class="kicker">Collection 01</span><h3>Cold pressed oils</h3><p>Groundnut, sesame, coconut, mustard and more.</p><span class="go">Explore oils</span></div></a>
+<a class="coll dry reveal" href="shop.html?category=dry-fruits"><img data-slot="dryfruits" data-local="assets/img/dryfruits.jpg" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-parallax alt=""><div class="coll-body"><span class="kicker">Collection 02</span><h3>Dry fruits &amp; seeds</h3><p>Almonds, cashews, dates, figs and pumpkin seeds.</p><span class="go">Explore dry fruits</span></div></a>
 </div></div></section>
 
 <section class="section tight"><div class="container">
@@ -94,7 +95,7 @@ page("product.html","product","Product | AGRIVA","Product details from AGRIVA. C
 page("about.html","about","Our Story | AGRIVA","About AGRIVA: a focused catalogue of cold pressed oils and dry fruits for the everyday pantry, with clear answers before you order.",
 '''<section class="page-head"><div class="container narrow" style="margin-inline:auto"><span class="kicker">Our story</span><h1 class="display">A smaller shelf, <em>better answered.</em></h1><p class="lede">AGRIVA keeps its catalogue focused on two familiar pantry categories, cold pressed oils and dry fruits, and puts a person behind every order.</p></div></section>
 <section class="section"><div class="container split">
-<div class="photo reveal"><img data-slot="story" data-local="assets/img/story.jpg" referrerpolicy="no-referrer" data-parallax alt="Oils and dry fruits arranged on a wooden counter"></div>
+<div class="photo reveal"><img data-slot="story" data-local="assets/img/story.jpg" loading="lazy" decoding="async" referrerpolicy="no-referrer" data-parallax alt="Oils and dry fruits arranged on a wooden counter"></div>
 <div class="reveal"><span class="kicker">What we do</span><h2 class="display">Clear information. <em>Direct</em> conversations.</h2>
 <p>We'd rather you ask a question than guess. For every product, our team can confirm current availability, pack formats, price and batch-specific details before you pay.</p>
 <p>Details such as origin, grade, ingredients, allergens and storage always come from the product label and current supplier records, not from a website's guesswork.</p>

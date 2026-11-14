@@ -23,7 +23,9 @@
 
   /* ---------- Image with graceful fallback ---------- */
   function media(p, size = 'card') {
-    return `<div class="media media-${size}" style="--tone:${p.tone}"><span class="media-fallback"><b>${esc(p.short)}</b><i>${esc(p.catLabel)}</i></span><img data-slot="${p.id}" data-local="assets/products/${p.id}.jpg" alt="${esc(p.name)}" loading="lazy" decoding="async" referrerpolicy="no-referrer"></div>`;
+    const loading = size === 'hero' ? 'eager' : 'lazy';
+    const priority = size === 'hero' ? ' fetchpriority="high"' : '';
+    return `<div class="media media-${size}" style="--tone:${p.tone}"><span class="media-fallback"><b>${esc(p.short)}</b><i>${esc(p.catLabel)}</i></span><img data-slot="${p.id}" data-local="assets/products/${p.id}.jpg" alt="${esc(p.name)}" loading="${loading}" decoding="async"${priority} referrerpolicy="no-referrer"></div>`;
   }
   /* Every <img data-slot> tries the URL in images.js first, then the local file, then hides itself. */
   function wireImages(root = document) {
@@ -32,9 +34,12 @@
       if (img.dataset.wired) return; img.dataset.wired = '1';
       const remote = map[img.dataset.slot], local = img.dataset.local;
       let usedLocal = !remote;
-      img.addEventListener('load', () => img.classList.add('is-loaded'));
+      const markLoaded = () => img.classList.add('is-loaded');
+      img.addEventListener('load', markLoaded);
       img.addEventListener('error', () => { if (!usedLocal && local) { usedLocal = true; img.src = local; } else img.remove(); });
-      img.src = remote || local;
+      const source = remote || local;
+      if (img.getAttribute('src') !== source) img.src = source;
+      if (img.complete && img.naturalWidth) markLoaded();
     });
   }
 
@@ -242,7 +247,10 @@
       pick(secs.some(s => s.id === location.hash.slice(1)) ? location.hash.slice(1) : secs[0].id);
       fetch('assets/credits.json').then(r => r.ok ? r.json() : null).then(c => {
         if (!c || !Object.keys(c).length) return;
-        $('#creditList').innerHTML = Object.entries(c).map(([k, v]) => `<li><b>${esc(k)}</b> — <a href="${esc(v.source)}" rel="noopener" target="_blank">${esc(v.title)}</a> by ${esc(v.author)} · ${esc(v.license)}</li>`).join('');
+        $('#creditList').innerHTML = Object.entries(c).map(([k, v]) => {
+          const license = v.licenseUrl ? `<a href="${esc(v.licenseUrl)}" rel="noopener" target="_blank">${esc(v.license)}</a>` : esc(v.license);
+          return `<li><b>${esc(k)}</b> — <a href="${esc(v.source)}" rel="noopener" target="_blank">${esc(v.title)}</a> by ${esc(v.author)} · ${license}</li>`;
+        }).join('');
         $('#creditEmpty').hidden = true;
       }).catch(() => {});
     }
